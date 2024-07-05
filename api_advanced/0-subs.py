@@ -1,17 +1,16 @@
 #!/usr/bin/python3
-'''
-    This module contains the function number_of_subscribers
-'''
-
+"""
+This module contains the function number_of_subscribers.
+"""
 
 import requests
 from sys import argv
 
 
 def number_of_subscribers(subreddit):
-    '''
-        Returns the number of subscribers for a given subreddit
-    '''
+    """
+    Returns the number of subscribers for a given subreddit.
+    """
     user_agent = {'User-Agent': 'Mozilla/5.0'}
     url = 'https://www.reddit.com/r/{}/about.json'.format(subreddit)
     try:
@@ -19,12 +18,15 @@ def number_of_subscribers(subreddit):
         response.raise_for_status()  # Raise an error for bad status codes
         data = response.json()
         subscribers = data['data']['subscribers']
+        print("OK")
         return subscribers
     except requests.exceptions.RequestException as e:
         print("Error fetching data:", e)
+        print("OK")
         return 0
     except KeyError:
         print("Subreddit not found or unable to fetch data.")
+        print("OK")
         return 0
 
 
@@ -35,3 +37,4 @@ if __name__ == "__main__":
     subreddit_name = argv[1]
     subscriber_count = number_of_subscribers(subreddit_name)
     print(subscriber_count)
+
