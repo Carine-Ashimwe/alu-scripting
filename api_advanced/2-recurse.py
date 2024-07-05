@@ -1,36 +1,39 @@
-ppend all the hot post's titles from a particular
-subreddit on a list calleg hot_list.
-"""
+#!/usr/bin/python3
+"""Return a list containing the titles
+ of all hot articles for a given subreddit"""
 
-import json
 import requests
 
+headers = {'User-Agent': 'MyAPI/0.0.1'}
 
-def recurse(subreddit, hot_list=[], after=None):
-    url = 'https://www.reddit.com/r/{}/hot.json'.format(subreddit)
-    headers = {'User-Agent': 'Mozilla/5.0'}
 
-    # After is set to none at first.
-    params = {'after': after} if after else {}
+def recurse(subreddit, after="", hot_list=[], page_counter=0):
 
-    response = requests.get(url, headers=headers, params=params)
+    subreddit_url = "https://reddit.com/r/{}/hot.json".format(subreddit)
+
+    parameters = {'limit': 100, 'after': after}
+    response = requests.get(subreddit_url, headers=headers, params=parameters)
 
     if response.status_code == 200:
-        data = response.json()
+        json_data = response.json()
 
-        for post in data['data']['children']:
-            title = post['data']['title']
+        for child in json_data.get('data').get('children'):
+            title = child.get('data').get('title')
             hot_list.append(title)
 
-        # set after to the last post of the previous result.
-        after = data['data']['after']
+        after = json_data.get('data').get('after')
+        if after is not None:
 
-        # call the function with the updated after i.e recursion
-        # to retrieve addition pages.
-        if after:
-            recurse(subreddit, hot_list, after)
+            page_counter += 1
+            # print(len(hot_list))
+            return recurse(subreddit, after=after,
+                           hot_list=hot_list, page_counter=page_counter)
+        else:
+            return hot_list
 
     else:
         return None
 
-    return hot_list
+
+if __name__ == '__main__':
+    print(recurse("recursor"))
